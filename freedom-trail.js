@@ -1,17 +1,22 @@
+
 var findRotateSteps = function (ring, key) {
-    let currentPosition = 0;
+    let left_index = (i) => (i == 0) ? (ring.length - 1) : (i - 1);
+    let right_index = (i) => (i == ring.length - 1) ? 0 : (i + 1);
 
-    let steps = 0;
+    let dp = ring.split('').map(() => 0);
 
-    for (let i = 0; i < key.length; i++) {
-         let difference = (key[i].charCodeAt(0) - ring[currentPosition].charCodeAt(0) + 26) % 26;
+    for (let i = key.length - 1; i >= 0; i--) {
+        let dp_new = ring.split('').map((x, j) => (x == key[i]) ? dp[j] : Infinity);
 
-         steps += Math.min(difference, 26 - difference);
+        for (let j = 0; j < ring.length * 2; j++) {
+            let x = j % ring.length;
+            dp_new[x] = Math.min(dp_new[x], dp_new[left_index(x)] + 1);
+            let y = ((ring.length * 2) - 1 - j) % ring.length;
+            dp_new[y] = Math.min(dp_new[y], dp_new[right_index(y)] + 1);
+        }
 
-        steps++;
-
-        currentPosition += difference;
+        dp = dp_new;
     }
 
-     return steps;
+    return dp[0] + key.length;
 };
