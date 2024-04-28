@@ -1,22 +1,39 @@
-
 var findRotateSteps = function (ring, key) {
-    let left_index = (i) => (i == 0) ? (ring.length - 1) : (i - 1);
-    let right_index = (i) => (i == ring.length - 1) ? 0 : (i + 1);
+    let dp = new Array(ring.length).fill(0);
+    let ringMap = new Map();
+    let steps = Infinity;
 
-    let dp = ring.split('').map(() => 0);
-
-    for (let i = key.length - 1; i >= 0; i--) {
-        let dp_new = ring.split('').map((x, j) => (x == key[i]) ? dp[j] : Infinity);
-
-        for (let j = 0; j < ring.length * 2; j++) {
-            let x = j % ring.length;
-            dp_new[x] = Math.min(dp_new[x], dp_new[left_index(x)] + 1);
-            let y = ((ring.length * 2) - 1 - j) % ring.length;
-            dp_new[y] = Math.min(dp_new[y], dp_new[right_index(y)] + 1);
-        }
-
-        dp = dp_new;
+    //the postions we can get char ring[i]
+    for (let i = 0; i < ring.length; i++) {
+        ringMap.has(ring[i]) ? ringMap.get(ring[i]).add(i) : ringMap.set(ring[i], new Set([i]));
     }
 
-    return dp[0] + key.length;
+    let prePositions = new Set([0]);
+    for (let i = 0; i < key.length; i++) {
+        let keyChar = key[i];
+        let curPos = ringMap.get(keyChar);
+        for (let cur of curPos.values()) {
+            let minCur = Infinity;
+
+            if (i > 0 && key[i - 1] === key[i]) {
+                //if it's same char from pre char, don't need to move, just spell
+                dp[cur]++;
+            } else {
+                //calculate the minimum steps to rotate to cur position
+                for (let pre of prePositions.values()) {
+                    let diff = Math.abs(cur - pre);
+                    let curSteps = dp[pre] + Math.min(diff, ring.length - diff) + 1;
+                    minCur = Math.min(minCur, curSteps);
+                }
+                dp[cur] = minCur;
+            }
+        }
+        prePositions = curPos;
+    }
+
+    for (let ringPos of ringMap.get(key[key.length - 1]).values()) {
+        steps = Math.min(steps, dp[ringPos]);
+    }
+
+    return steps;
 };
