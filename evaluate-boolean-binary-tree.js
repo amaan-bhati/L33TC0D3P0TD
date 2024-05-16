@@ -1,3 +1,5 @@
+
+
 var evaluateTree = function (root) {
     function Recurse(node) {
         if (node.val === 0 || node.val === 1) {
