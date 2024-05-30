@@ -1,8 +1,3 @@
-
-/**
- * @param {string} s
-  * @return {number}
-   */
 var numSteps = function (s) {
     let num = BigInt("0b" + s);
     let count = 0;
